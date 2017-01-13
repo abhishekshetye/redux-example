@@ -13,13 +13,34 @@ console.log('starting redux example');
 //when pass obj and arr make sure you don't manipulate them
 
 
-var reducer = (state = {name: 'Anonymous'}, action) => {
-	
-	return state;
+var stateDefault = {
+	name : 'Anonymous'
 };
+
+var reducer = (state = stateDefault, action) => {
+
+	switch(action.type){
+		case 'CHANGE_NAME':
+			return { 
+				...state,
+				name: action.name
+			};
+
+		default:
+			return state;
+	}
+
+}
 
 var store = redux.createStore(reducer);
 
-var currentState = store.getState();
+console.log('Current state', store.getState());
 
-console.log('current state ', currentState);
+var action = {
+	type: 'CHANGE_NAME',
+	name: 'Abhishek'
+};
+
+store.dispatch(action);
+
+console.log('Now state', store.getState());
