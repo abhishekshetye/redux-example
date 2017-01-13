@@ -14,13 +14,6 @@ $(document).ready(function($) {
 //app css
 require('style-loader!css-loader!sass-loader!applicationStyles');
 
-ReactDOM.render(
-<Router history={hashHistory}>
-	<Route path='/' component={Main}>
-	
-	</Route>
-</Router>,
-document.getElementById('root')
-);
 
 require('./redux-todo-example.jsx');
+//require('./redux-example.jsx');

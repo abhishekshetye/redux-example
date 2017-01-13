@@ -30,11 +30,23 @@ var reducer = (state = stateDefault, action) => {
 			return state;
 	}
 
-}
+};
 
-var store = redux.createStore(reducer);
+var store = redux.createStore(reducer, redux.compose(
+	window.devToolsExtension ? window.devToolsExtension() : f => f
+));
 
-console.log('Current state', store.getState());
+//subscribe to changes
+var unsubscribe = store.subscribe(() => {
+
+	var state = store.getState();
+	//need to re-render components here
+	console.log('New state ', state.name);
+	document.getElementById('root').innerHTML = state.name;
+});
+
+// //unsubscribed 
+// unsubscribe();
 
 var action = {
 	type: 'CHANGE_NAME',
@@ -43,4 +55,12 @@ var action = {
 
 store.dispatch(action);
 
-console.log('Now state', store.getState());
+
+store.dispatch({
+	type: 'CHANGE_NAME',
+	name: 'Emily'
+})
+
+
+
+
