@@ -22,3 +22,5 @@ ReactDOM.render(
 </Router>,
 document.getElementById('root')
 );
+
+require('./redux-todo-example.jsx');
