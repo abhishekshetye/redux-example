@@ -1,5 +1,5 @@
 var redux = require('redux');
-
+var axios = require('axios');
 console.log('starting redux example');
 
 //pure functions are - 
@@ -101,11 +101,62 @@ var addMovie = ((name, actor) => {
 	}
 })
 
+
+//map reducers and action generators
+//-----------------------------------
+
+var mapReducers = (state = {isFetching: false, url: undefined} , action) => {
+
+	switch(action.type){
+		case 'START_LOCATION_FETCH':
+			return {
+				isFetching: true,
+				url: undefined
+			};
+		case 'COMPLETE_LOCATION_FETCH':
+			return {
+				isFetching: false,
+				url: action.url
+			};
+		default:
+			return state;
+	}
+};
+
+var startLocationFetch = () => {
+	return {
+		type: 'START_LOCATION_FETCH'
+	}
+}
+
+var completeLocationFetch = (url) => {
+	return {
+		type: 'COMPLETE_LOCATION_FETCH',
+		url
+	}
+}
+
+var fetchLocation = () => {
+	store.dispatch(startLocationFetch());
+
+
+	axios.get('http://ipinfo.io').then(function(res){
+		var loc = res.data.loc;
+		var baseUrl = 'http://maps.google.com?q=';
+
+		store.dispatch(completeLocationFetch(baseUrl + loc));
+	});
+};
+
+
+
+
 //main reducers
 var reducer = redux.combineReducers({
 	name : nameReducer,
 	hobbies : hobbiesReducer,
-	movies : moviesReducers
+	movies : moviesReducers,
+	map: mapReducers
 })
 
 var store = redux.createStore(reducer, redux.compose(
@@ -116,9 +167,15 @@ var store = redux.createStore(reducer, redux.compose(
 var unsubscribe = store.subscribe(() => {
 
 	var state = store.getState();
+
+	if(state.map.isFetching){
+		document.getElementById('root').innerHTML = 'Loading'		
+	}else if (state.map.url) {
+		document.getElementById('root').innerHTML = '<a href="' + state.map.url + '" target="_blank"> View your location </a>'
+	}
 	//need to re-render components here
-	//console.log('New state ', state.name);
-	document.getElementById('root').innerHTML = state.name;
+	// //console.log('New state ', state.name);
+	// document.getElementById('root').innerHTML = state.name;
 	console.log('New state ', store.getState() );
 });
 
@@ -130,8 +187,10 @@ var action = {
 	name: 'Abhishek'
 };
 
-store.dispatch(changeName('Abhishek'));
 
+fetchLocation();
+
+store.dispatch(changeName('Abhishek'));
 
 store.dispatch(addHobby('Running'))
 
